@@ -11,10 +11,10 @@ public class Player : MonoBehaviour
     private Transform _cameraTransform;
     private float _rotationX = 0f;
     
-    private float _jumpForce = 5f; // Kekuatan lompatan
-    private bool _isGrounded; // Cek apakah pemain menyentuh tanah
+    private float _jumpForce = 5f; 
+    private bool _isGrounded; 
 
-    private bool _isTeleporting = false; // Mode teleportasi
+    private bool _isTeleporting = false; 
 
     private void Awake()
     {
@@ -32,15 +32,15 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T)) 
         {
-            _isTeleporting = true; // Aktifkan mode teleportasi
-            Cursor.lockState = CursorLockMode.None; // Bebaskan kursor untuk klik
+            _isTeleporting = true; 
+            Cursor.lockState = CursorLockMode.None; 
             Cursor.visible = true;
             return;
         }
 
         if (_isTeleporting && Input.GetMouseButtonDown(0)) 
         {
-            TeleportPlayer(); // Jalankan fungsi teleportasi
+            TeleportPlayer(); 
             return;
         }
 
@@ -100,14 +100,14 @@ public class Player : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.collider.CompareTag("Ground")) // Pastikan teleport ke tempat valid
+            if (hit.collider.CompareTag("Ground")) 
             {
-                transform.position = hit.point + Vector3.up * 1.0f; // Tambah sedikit tinggi agar tidak menempel ke tanah
-                _rigidBody.linearVelocity = Vector3.zero; // Hentikan kecepatan setelah teleportasi
+                transform.position = hit.point + Vector3.up * 1.0f; 
+                _rigidBody.linearVelocity = Vector3.zero; 
             }
         }
 
-        _isTeleporting = false; // Matikan mode teleportasi
+        _isTeleporting = false; 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
