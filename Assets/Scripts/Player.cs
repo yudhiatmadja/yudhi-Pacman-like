@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,11 +11,19 @@ public class Player : MonoBehaviour
     private float _mouseSensitivity = 2f;
     private Transform _cameraTransform;
     private float _rotationX = 0f;
-    
-    private float _jumpForce = 5f; 
-    private bool _isGrounded; 
+    private bool _isMagnetActive = false;
+    private float _magnetRange = 5f;
 
-    private bool _isTeleporting = false; 
+    private float _jumpForce = 5f;
+    private bool _isGrounded;
+
+    private bool _isTeleporting = false;
+    [SerializeField]
+    private float _powerupDuration;
+    private Coroutine _powerupCoroutine;
+    public Action OnPowerUpStart;
+
+    public Action OnPowerUpStop;
 
     private void Awake()
     {
@@ -28,19 +37,27 @@ public class Player : MonoBehaviour
         _cameraTransform = Camera.main.transform;
     }
 
+    private void FixedUpdate()
+    {
+        if (_isMagnetActive)
+        {
+            TarikKoinDekat();
+        }
+    }
+
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T)) 
+        if (Input.GetKeyDown(KeyCode.T))
         {
-            _isTeleporting = true; 
-            Cursor.lockState = CursorLockMode.None; 
+            _isTeleporting = true; // Aktifkan mode teleportasi
+            Cursor.lockState = CursorLockMode.None; // Bebaskan kursor untuk klik
             Cursor.visible = true;
             return;
         }
 
-        if (_isTeleporting && Input.GetMouseButtonDown(0)) 
+        if (_isTeleporting && Input.GetMouseButtonDown(0))
         {
-            TeleportPlayer(); 
+            TeleportPlayer(); // Jalankan fungsi teleportasi
             return;
         }
 
@@ -66,7 +83,7 @@ public class Player : MonoBehaviour
         else
         {
             _rigidBody.linearVelocity = new Vector3(0, _rigidBody.linearVelocity.y, 0);
-        } 
+        }
 
         float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity;
@@ -93,6 +110,25 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void AktifkanMagnet(bool aktif)
+    {
+        _isMagnetActive = aktif;
+    }
+
+    private void TarikKoinDekat()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, _magnetRange);
+
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.CompareTag("Coin"))
+            {
+                Vector3 arahTarik = (transform.position - hitCollider.transform.position).normalized;
+                hitCollider.transform.position += arahTarik * Time.deltaTime * 5f;  // Tarik koin ke player
+            }
+        }
+    }
+
     private void TeleportPlayer()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -100,15 +136,36 @@ public class Player : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.collider.CompareTag("Ground")) 
+            if (hit.collider.CompareTag("Ground")) // Pastikan teleport ke tempat valid
             {
-                transform.position = hit.point + Vector3.up * 1.0f; 
-                _rigidBody.linearVelocity = Vector3.zero; 
+                transform.position = hit.point + Vector3.up * 1.0f; // Tambah sedikit tinggi agar tidak menempel ke tanah
+                _rigidBody.linearVelocity = Vector3.zero; // Hentikan kecepatan setelah teleportasi
             }
         }
 
-        _isTeleporting = false; 
+        _isTeleporting = false; // Matikan mode teleportasi
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+    public void PickPowerUp()
+    {
+        if (_powerupCoroutine != null)
+        {
+            StopCoroutine(_powerupCoroutine);
+        }
+        _powerupCoroutine = StartCoroutine(StartPowerUp());
+    }
+
+    private IEnumerator StartPowerUp()
+    {
+        if (OnPowerUpStart != null)
+        {
+            OnPowerUpStart();
+        }
+        yield return new WaitForSeconds(_powerupDuration);
+        if (OnPowerUpStop != null)
+        {
+            OnPowerUpStop();
+        }
     }
 }
