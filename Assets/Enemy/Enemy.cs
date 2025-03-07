@@ -20,10 +20,9 @@ public class Enemy : MonoBehaviour
 
     private void Awake()
     {
+        NavMeshAgent = GetComponent<NavMeshAgent>();
         _currentState = PatrolState;
         _currentState.EnterState(this);
-        NavMeshAgent = GetComponent<NavMeshAgent>();
-
     }
 
     private void Start()
@@ -33,6 +32,17 @@ public class Enemy : MonoBehaviour
             Player.OnPowerUpStart += StartRetreating;
             Player.OnPowerUpStop += StopRetreating;
         }
+        NavMeshAgent.isStopped = false;
+        NavMeshAgent.updateRotation = true;
+
+        if (NavMeshAgent == null)
+        {
+            Debug.LogError("NavMeshAgent tidak ditemukan pada Enemy!");
+        }
+        else if (!NavMeshAgent.isOnNavMesh)
+        {
+            Debug.LogError("Enemy tidak berada di atas NavMesh!");
+        }
     }
 
     private void Update()
@@ -41,13 +51,24 @@ public class Enemy : MonoBehaviour
         {
             _currentState.UpdateState(this);
         }
+        if (Player == null)
+        {
+            Debug.LogError("Player tidak ditemukan!");
+        }
     }
     public void SwitchState(BaseState state)
     {
-        _currentState.ExitState(this);
+        Debug.Log("Beralih dari " + _currentState.GetType().Name + " ke " + state.GetType().Name);
+
+        if (_currentState != null)
+        {
+            _currentState.ExitState(this);
+        }
+
         _currentState = state;
         _currentState.EnterState(this);
     }
+
     private void StartRetreating()
     {
         SwitchState(RetreatState);
