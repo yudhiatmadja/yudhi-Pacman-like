@@ -39,7 +39,7 @@ public class PickableManager : MonoBehaviour
 
         if (type == PickableType.Coin)
         {
-            int nilaiKoin = isDoubleScoreActive ? 2 : 1;  // Double score aktif atau tidak
+            int nilaiKoin = isDoubleScoreActive ? 2 : 1;  
             skorKoin += nilaiKoin;
             UpdateTeksSkor();
         }

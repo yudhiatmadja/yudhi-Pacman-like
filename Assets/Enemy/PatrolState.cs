@@ -4,57 +4,38 @@ using UnityEngine;
 
 public class PatrolState : BaseState
 {
-    private bool _isMoving = false;
+    private bool _isMoving;
     private Vector3 _destination;
-
     public void EnterState(Enemy enemy)
     {
         _isMoving = false;
+        enemy.animator.SetTrigger("PatrolState");
     }
 
     public void UpdateState(Enemy enemy)
     {
-        if (enemy.Player == null)
+        if (Vector3.Distance(enemy.transform.position, enemy.Player.transform.position) < enemy.ChaseDistance)
         {
-            Debug.LogError("Player tidak ditemukan!");
-            return;
-        }
-
-        float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.Player.transform.position);
-        // Debug.Log("Jarak ke Player: " + distanceToPlayer + ", ChaseDistance: " + enemy.ChaseDistance);
-
-        if (distanceToPlayer < enemy.ChaseDistance)
-        {
-            Debug.Log("Player dalam jarak kejar, switching ke ChaseState");
             enemy.SwitchState(enemy.ChaseState);
-            return;
         }
 
-        // Jika tidak sedang mengejar, lakukan patrol
         if (!_isMoving)
         {
-            if (enemy.Waypoints.Count == 0)
-            {
-                Debug.LogWarning("Tidak ada waypoint yang tersedia!");
-                return;
-            }
-
-            int index = Random.Range(0, enemy.Waypoints.Count);
-            _destination = enemy.Waypoints[index].position;
-
-            enemy.NavMeshAgent.isStopped = false;
-            enemy.NavMeshAgent.SetDestination(_destination);
             _isMoving = true;
+            int index = UnityEngine.Random.Range(0, enemy.Waypoints.Count);
+            _destination = enemy.Waypoints[index].position;
+            enemy.NavMeshAgent.destination = _destination;
         }
         else
         {
-            if (enemy.NavMeshAgent.remainingDistance <= enemy.NavMeshAgent.stoppingDistance)
+            if (!enemy.NavMeshAgent.pathPending && enemy.NavMeshAgent.remainingDistance <= 0.1f)
             {
                 _isMoving = false;
             }
         }
-    }
 
+        
+    }
 
     public void ExitState(Enemy enemy)
     {
