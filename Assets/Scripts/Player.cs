@@ -24,6 +24,20 @@ public class Player : MonoBehaviour
     public Action OnPowerUpStart;
 
     public Action OnPowerUpStop;
+    private bool isPowerUpActive = false;
+    private AudioSource enemyDeathAudioSource;
+    public AudioClip enemyDeath;
+    private AudioSource gameOverAudioSource;
+    public AudioClip gameOverAudio;
+    [SerializeField] private GameObject gameOver;
+    [SerializeField] private int _health = 3;
+
+    private void Start()
+    {
+        enemyDeathAudioSource = GetComponent<AudioSource>();
+        gameOverAudioSource = GetComponent<AudioSource>();
+        UIHealthManager.Instance.UpdateHealth(_health);
+    }
 
     private void Awake()
     {
@@ -49,15 +63,15 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            _isTeleporting = true; // Aktifkan mode teleportasi
-            Cursor.lockState = CursorLockMode.None; // Bebaskan kursor untuk klik
+            _isTeleporting = true;
+            Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             return;
         }
 
         if (_isTeleporting && Input.GetMouseButtonDown(0))
         {
-            TeleportPlayer(); // Jalankan fungsi teleportasi
+            TeleportPlayer();
             return;
         }
 
@@ -108,6 +122,22 @@ public class Player : MonoBehaviour
         {
             _isGrounded = true;
         }
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (isPowerUpActive)
+            {
+                collision.gameObject.GetComponent<Enemy>().Dead();
+                if (enemyDeathAudioSource != null)
+                {
+                    enemyDeathAudioSource.PlayOneShot(enemyDeath);
+                }
+            }
+            else
+            {
+                Debug.Log("Player terkena musuh, health berkurang!");
+                KurangiHealth(1);
+            }
+        }
     }
 
     public void AktifkanMagnet(bool aktif)
@@ -136,14 +166,14 @@ public class Player : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.collider.CompareTag("Ground")) // Pastikan teleport ke tempat valid
+            if (hit.collider.CompareTag("Ground"))
             {
-                transform.position = hit.point + Vector3.up * 1.0f; // Tambah sedikit tinggi agar tidak menempel ke tanah
-                _rigidBody.linearVelocity = Vector3.zero; // Hentikan kecepatan setelah teleportasi
+                transform.position = hit.point + Vector3.up * 1.0f;
+                _rigidBody.linearVelocity = Vector3.zero;
             }
         }
 
-        _isTeleporting = false; // Matikan mode teleportasi
+        _isTeleporting = false;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -158,14 +188,38 @@ public class Player : MonoBehaviour
 
     private IEnumerator StartPowerUp()
     {
+        isPowerUpActive = true;
         if (OnPowerUpStart != null)
         {
             OnPowerUpStart();
         }
         yield return new WaitForSeconds(_powerupDuration);
+        isPowerUpActive = false;
         if (OnPowerUpStop != null)
         {
             OnPowerUpStop();
         }
     }
+    private void KurangiHealth(int jumlah)
+    {
+        _health -= jumlah;
+        UIHealthManager.Instance.UpdateHealth(_health);
+
+        if (_health <= 0)
+        {
+            PlayerMati();
+        }
+    }
+
+    private void PlayerMati()
+    {
+        gameOver.SetActive(true);
+        Time.timeScale = 0f;
+        Backsound.instance.StopMusicOnPlayerDeath();
+        if (gameOverAudioSource != null)
+        {
+            gameOverAudioSource.PlayOneShot(gameOverAudio);
+        }
+    }
+
 }

@@ -15,6 +15,8 @@ public class Enemy : MonoBehaviour
     [HideInInspector] public RetreatState RetreatState = new RetreatState();
     [HideInInspector] public NavMeshAgent NavMeshAgent;
     [HideInInspector] public Animator animator;
+    public bool isAlive = true;
+    
 
     public void SwitchState(BaseState state)
     {
@@ -56,5 +58,10 @@ public class Enemy : MonoBehaviour
     private void StopRetreating()
     {
         SwitchState(PatrolState);
+    }
+
+    public void Dead()
+    {    
+        Destroy(gameObject);
     }
 }
