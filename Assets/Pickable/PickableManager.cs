@@ -16,11 +16,21 @@ public class PickableManager : MonoBehaviour
     private bool isDoubleScoreActive = false;
     private int _totalKoin; 
     private int _totalPickable;
-    public AudioSource audioSource; 
+    public AudioSource coinAudioSource; 
     public AudioClip coinSound;
+    public AudioSource menangAudioSource;
+    public AudioClip menangSound;
+    // [HideInInspector] public Animator animator;
 
+
+    private void Awake()
+    {
+        // animator = GetComponent<Animator>();
+    }
     private void Start()
     {
+        coinAudioSource = GetComponent<AudioSource>();
+        menangAudioSource = GetComponent<AudioSource>();
         panelMenang.SetActive(false);
         InitPickableList();
         UpdateTeksSkor();
@@ -62,9 +72,9 @@ public class PickableManager : MonoBehaviour
             jumlahKoinDiambil++; 
             int nilaiKoin = isDoubleScoreActive ? 2 : 1;
             skorKoin += nilaiKoin;
-            if (audioSource && coinSound)
+            if (coinAudioSource && coinSound)
             {
-                audioSource.PlayOneShot(coinSound);
+                coinAudioSource.PlayOneShot(coinSound);
             }
             UpdateTeksSkor();
             JumlahCoin();
@@ -72,6 +82,7 @@ public class PickableManager : MonoBehaviour
         else if (type == PickableType.PowerUp)
         {
             // Debug.Log("PowerUp diambil!");
+            // animator.SetTrigger("PowerUp");
             player?.PickPowerUp();
             StartCoroutine(AktifkanPowerUp());
         }
@@ -95,6 +106,10 @@ public class PickableManager : MonoBehaviour
     {
         panelMenang.SetActive(true);
         Time.timeScale = 0f;
+        if (menangAudioSource && menangSound)
+        {
+            menangAudioSource.PlayOneShot(menangSound);
+        }
     }
 
     private IEnumerator AktifkanPowerUp()

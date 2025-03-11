@@ -29,14 +29,25 @@ public class Player : MonoBehaviour
     public AudioClip enemyDeath;
     private AudioSource gameOverAudioSource;
     public AudioClip gameOverAudio;
+
+    private AudioSource respawnAudioSource;
+    public AudioClip respawnAudio;
     [SerializeField] private GameObject gameOver;
     [SerializeField] private int _health = 3;
+    [HideInInspector] public Animator animator;
+    [SerializeField] Transform _respawnPoint;
+    [SerializeField] private float blinkDuration = 1f;
+    [SerializeField] private int blinkCount = 5;
+    private Renderer _renderer;
+
 
     private void Start()
     {
         enemyDeathAudioSource = GetComponent<AudioSource>();
         gameOverAudioSource = GetComponent<AudioSource>();
+        respawnAudioSource = GetComponent<AudioSource>();
         UIHealthManager.Instance.UpdateHealth(_health);
+        _renderer = GetComponent<Renderer>();
     }
 
     private void Awake()
@@ -134,8 +145,8 @@ public class Player : MonoBehaviour
             }
             else
             {
-                Debug.Log("Player terkena musuh, health berkurang!");
-                KurangiHealth(1);
+                // Debug.Log("Player terkena musuh, health berkurang!");
+                reduceHealth(1);
             }
         }
     }
@@ -154,7 +165,7 @@ public class Player : MonoBehaviour
             if (hitCollider.CompareTag("Coin"))
             {
                 Vector3 arahTarik = (transform.position - hitCollider.transform.position).normalized;
-                hitCollider.transform.position += arahTarik * Time.deltaTime * 5f;  // Tarik koin ke player
+                hitCollider.transform.position += arahTarik * Time.deltaTime * 5f;
             }
         }
     }
@@ -200,18 +211,33 @@ public class Player : MonoBehaviour
             OnPowerUpStop();
         }
     }
-    private void KurangiHealth(int jumlah)
+    private void reduceHealth(int jumlah)
     {
         _health -= jumlah;
         UIHealthManager.Instance.UpdateHealth(_health);
 
+        if (_health > 0)
+        {
+            Respawn();
+        }
+
         if (_health <= 0)
         {
-            PlayerMati();
+            Dead();
         }
     }
 
-    private void PlayerMati()
+    private void Respawn()
+    {
+        transform.position = _respawnPoint.position;
+        if (respawnAudio != null)
+        {
+            respawnAudioSource.PlayOneShot(respawnAudio);
+            StartCoroutine(BlinkEffect());
+        }
+    }
+
+    private void Dead()
     {
         gameOver.SetActive(true);
         Time.timeScale = 0f;
@@ -221,5 +247,14 @@ public class Player : MonoBehaviour
             gameOverAudioSource.PlayOneShot(gameOverAudio);
         }
     }
-
+    private IEnumerator BlinkEffect()
+    {
+        for (int i = 0; i < blinkCount; i++)
+        {
+            _renderer.enabled = false;
+            yield return new WaitForSeconds(blinkDuration / (blinkCount * 2));
+            _renderer.enabled = true;
+            yield return new WaitForSeconds(blinkDuration / (blinkCount * 2));
+        }
+    }
 }

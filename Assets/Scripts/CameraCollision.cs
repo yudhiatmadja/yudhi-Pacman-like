@@ -34,7 +34,7 @@ public class CameraCollision : MonoBehaviour
             currentDistance = maxDistance;
         }
 
-        // **Lerp posisi kamera agar lebih smooth**
+        
         transform.localPosition = Vector3.Lerp(transform.localPosition, dollyDirection * currentDistance, Time.deltaTime * smoothSpeed);
     }
 }

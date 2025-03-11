@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,6 +7,8 @@ public class Backsound : MonoBehaviour
     public static Backsound instance { get; private set; }
 
     private AudioSource audioSource;
+    private AudioSource readyAudioSource;
+    public AudioClip readySound;
 
     private void Awake()
     {
@@ -21,18 +24,31 @@ public class Backsound : MonoBehaviour
         }
 
         audioSource = GetComponent<AudioSource>();
+        readyAudioSource = gameObject.AddComponent<AudioSource>();
+
     }
 
     private void Start()
     {
-        if (SceneManager.GetActiveScene().name == "SampleScene")
+        if (SceneManager.GetActiveScene().name == "GamePlay")
         {
-            PlayMusic(); 
+            StartCoroutine(PlaySFXthenMusic()); 
         }
         else
         {
             StopMusic(); 
         }
+    }
+
+    private IEnumerator PlaySFXthenMusic()
+    {
+        if (readySound != null)
+        {
+            readyAudioSource.clip = readySound;
+            readyAudioSource.Play();
+            yield return new WaitForSeconds(readySound.length);
+        }
+        PlayMusic();
     }
 
     public void PlayMusic()
