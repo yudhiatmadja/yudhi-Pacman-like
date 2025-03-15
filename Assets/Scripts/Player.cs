@@ -27,12 +27,12 @@ public class Player : MonoBehaviour
     private bool isPowerUpActive = false;
     private AudioSource enemyDeathAudioSource;
     public AudioClip enemyDeath;
-    private AudioSource gameOverAudioSource;
-    public AudioClip gameOverAudio;
+    // private AudioSource gameOverAudioSource;
+    // public AudioClip gameOverAudio;
 
     private AudioSource respawnAudioSource;
     public AudioClip respawnAudio;
-    [SerializeField] private GameObject gameOver;
+    // [SerializeField] private GameObject gameOver;
     [SerializeField] private int _health = 3;
     [HideInInspector] public Animator animator;
     [SerializeField] Transform _respawnPoint;
@@ -44,7 +44,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         enemyDeathAudioSource = GetComponent<AudioSource>();
-        gameOverAudioSource = GetComponent<AudioSource>();
+        // gameOverAudioSource = GetComponent<AudioSource>();
         respawnAudioSource = GetComponent<AudioSource>();
         UIHealthManager.Instance.UpdateHealth(_health);
         _renderer = GetComponent<Renderer>();
@@ -239,13 +239,13 @@ public class Player : MonoBehaviour
 
     private void Dead()
     {
-        gameOver.SetActive(true);
+        
         Time.timeScale = 0f;
         Backsound.instance.StopMusicOnPlayerDeath();
-        if (gameOverAudioSource != null)
-        {
-            gameOverAudioSource.PlayOneShot(gameOverAudio);
-        }
+        // if (gameOverAudioSource != null)
+        // {
+        //     gameOverAudioSource.PlayOneShot(gameOverAudio);
+        // }
     }
     private IEnumerator BlinkEffect()
     {
