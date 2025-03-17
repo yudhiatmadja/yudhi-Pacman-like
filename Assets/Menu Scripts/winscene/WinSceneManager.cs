@@ -1,14 +1,21 @@
 using UnityEngine;
-using UnityEngine.UI; // Jika menggunakan Image untuk sprite
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class WinSceneManager : MonoBehaviour
 {
     [SerializeField] private GameObject[] bintang;
     [SerializeField] private Sprite emptyStarSprite;
     [SerializeField] private Text scoreText;
+    // public Button replayBtn;
+    // public ButtonManagement mainMenuBtn;
+    private string gameplaySceneName = "Gameplay";
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         int jumlahBintang = PlayerPrefs.GetInt("JumlahBintang", 0);
         int score = PlayerPrefs.GetInt("PlayerScore", 0);
 
@@ -38,5 +45,17 @@ public class WinSceneManager : MonoBehaviour
                 Debug.Log($"Mengubah bintang ke-{i} menjadi kosong");
             }
         }
+    }
+
+    public void ReplayGame()
+    {
+        PlayerPrefs.SetInt("PlayerScore", 0);
+        PlayerPrefs.Save();
+        SceneManager.LoadScene(gameplaySceneName);
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

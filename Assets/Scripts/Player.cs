@@ -240,12 +240,10 @@ public class Player : MonoBehaviour
     private void Dead()
     {
         
-        Time.timeScale = 0f;
         Backsound.instance.StopMusicOnPlayerDeath();
-        // if (gameOverAudioSource != null)
-        // {
-        //     gameOverAudioSource.PlayOneShot(gameOverAudio);
-        // }
+        StartCoroutine(LoadLoseScene());
+
+
     }
     private IEnumerator BlinkEffect()
     {
@@ -256,5 +254,11 @@ public class Player : MonoBehaviour
             _renderer.enabled = true;
             yield return new WaitForSeconds(blinkDuration / (blinkCount * 2));
         }
+    }
+
+    private IEnumerator LoadLoseScene()
+    {
+        yield return new WaitForSeconds(1f);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("losescene");
     }
 }

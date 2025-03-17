@@ -13,8 +13,9 @@ public class WinTextAnimation : MonoBehaviour
     void Start()
     {
         winText = GetComponent<Text>();
-        playerStars = PlayerPrefs.GetInt("PlayerStars", 0);
-        winText.text = playerStars < 5 ? "GAME OVER" : "YOU WIN";
+        playerStars = PlayerPrefs.GetInt("JumlahBintang", 0);
+        Debug.Log("PlayerStars: " + playerStars);
+        winText.text = playerStars >= 5 ? "YOU WIN" : "GAME OVER";
         winText.color = new Color(winText.color.r, winText.color.g, winText.color.b, 0); 
         StartCoroutine(AnimateText());
     }
