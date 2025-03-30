@@ -6,10 +6,10 @@ public class RetreatState : BaseState
 {
     public void EnterState(Enemy enemy)
     {
-      if (enemy.isAlive && enemy.animator != null)
-      {
-       enemy.animator.SetTrigger("RetreatState");  
-      }
+      // if (enemy.isAlive && enemy.animator != null)
+      // {
+      //  enemy.animator.SetTrigger("RetreatState");  
+      // }
     }
 
     public void UpdateState(Enemy enemy)

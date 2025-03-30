@@ -16,7 +16,8 @@ public class Enemy : MonoBehaviour
     [HideInInspector] public NavMeshAgent NavMeshAgent;
     [HideInInspector] public Animator animator;
     public bool isAlive = true;
-    
+    [SerializeField] private int maxHealth = 5;
+    private int currentHealth;
 
     public void SwitchState(BaseState state)
     {
@@ -44,10 +45,17 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        if(_currentState != null)
+        if (_currentState != null)
         {
             _currentState.UpdateState(this);
         }
+        UpdateAnimation();
+    }
+
+    private void UpdateAnimation()
+    {
+        float speed = NavMeshAgent.velocity.magnitude;
+        animator.SetFloat("Speed", speed);
     }
 
     private void StartRetreating()
@@ -61,7 +69,17 @@ public class Enemy : MonoBehaviour
     }
 
     public void Dead()
-    {    
+    {
         Destroy(gameObject);
     }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        if (currentHealth <= 0)
+        {
+            Dead();
+        }
+    }
+
 }

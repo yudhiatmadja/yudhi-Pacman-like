@@ -8,10 +8,10 @@ public class ChaseState : BaseState
 {
     public void EnterState(Enemy enemy)
     {
-      if (enemy.isAlive && enemy.animator != null)
-      {
-       enemy.animator.SetTrigger("ChaseState");
-      }
+      // if (enemy.isAlive && enemy.animator != null)
+      // {
+      //  enemy.animator.SetTrigger("ChaseState");
+      // }
     }
 
     public void UpdateState(Enemy enemy)
